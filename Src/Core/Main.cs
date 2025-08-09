@@ -16,6 +16,7 @@ using System.Timers;
 using UnityEngine;
 using static Rocket.Unturned.Events.UnturnedEvents;
 using Logger = Rocket.Core.Logging.Logger;
+using UrpUnturnov.Systems;
 
 namespace URPUnturnov
 {
@@ -34,6 +35,7 @@ namespace URPUnturnov
             try
             {
                 Logger.Log("Loading URP-Unturnov");
+                ClothingProtectionSystem.Initialize();
 
                 try
                 {
@@ -75,6 +77,7 @@ namespace URPUnturnov
             {
                 TimerSendMainWebhookData?.Stop();
                 GuiManager?.Shutdown();
+                ClothingProtectionSystem.Shutdown();
 
                 Logger.Log("URP-Unturnov has been unloaded");
             }
