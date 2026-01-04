@@ -14,5 +14,6 @@ namespace UrpUnturnov.Data
         public byte[] State { get; set; }
         public byte Quantity { get; set; }
         public System.DateTime ListedAt { get; set; }
+        public string IconUrl { get; set; }
     }
 }

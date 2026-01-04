@@ -98,7 +98,6 @@
         <Compile Include="Src\Core\DatabaseManager.cs" />
         <Compile Include="Src\Core\GuiManager.cs" />
         <Compile Include="Src\Core\Main.cs" />
-        <Compile Include="Src\Systems\KeepClothing.cs" />
         <Compile Include="Src\Systems\MarketListings.cs" />
         <Compile Include="Src\Systems\MarketManager.cs" />
     </ItemGroup>

@@ -34,8 +34,7 @@ namespace URPUnturnov
             Instance = this;
             try
             {
-                Logger.Log("Loading URP-Unturnov");
-                ClothingProtectionSystem.Initialize();
+                Logger.Log("Loading URP-FleaMarket");
 
                 try
                 {
@@ -62,8 +61,8 @@ namespace URPUnturnov
                 TimerSendMainWebhookData.Interval = Configuration.Instance.WebhookSendInterval;
                 TimerSendMainWebhookData.Enabled = true;
 
-                Logger.Log("URP-Unturnov has been loaded");
-                SendMainWebhook("`URP-Unturnov` has started");
+                Logger.Log("URP-FleaMarket has been loaded");
+                SendMainWebhook("`URP-FleaMarket` has started");
             }
             catch (Exception ex)
             {
@@ -77,9 +76,8 @@ namespace URPUnturnov
             {
                 TimerSendMainWebhookData?.Stop();
                 GuiManager?.Shutdown();
-                ClothingProtectionSystem.Shutdown();
 
-                Logger.Log("URP-Unturnov has been unloaded");
+                Logger.Log("URP-FleaMarket has been unloaded");
             }
             catch (Exception ex)
             {

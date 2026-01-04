@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SDG.Unturned;
 using UrpUnturnov.Data;
+using Steamworks;
 
 namespace UrpUnturnov.Systems
 {
@@ -20,12 +21,26 @@ namespace UrpUnturnov.Systems
 
         public static List<MarketListing> GetListings(string category = "all", int page = 1, int itemsPerPage = 10)
         {
+            return GetListings(category, page, itemsPerPage, "");
+        }
+
+        public static List<MarketListing> GetListings(string category, int page, int itemsPerPage, string searchTerm)
+        {
             var filteredListings = _listings.AsQueryable();
 
-            // Filter by category if needed
-            if (category != "all")
+            if (!string.IsNullOrEmpty(searchTerm))
             {
-                filteredListings = filteredListings.Where(l => GetItemCategory(l.ItemId) == category);
+                string lowerSearchTerm = searchTerm.ToLower();
+                filteredListings = filteredListings.Where(l => 
+                    l.ItemName.ToLower().Contains(lowerSearchTerm)
+                );
+            }
+            else
+            {
+                if (category != "all")
+                {
+                    filteredListings = filteredListings.Where(l => GetItemCategory(l.ItemId) == category);
+                }
             }
 
             return filteredListings
@@ -33,6 +48,38 @@ namespace UrpUnturnov.Systems
                 .Skip((page - 1) * itemsPerPage)
                 .Take(itemsPerPage)
                 .ToList();
+        }
+
+        public static List<MarketListing> GetPlayerListings(CSteamID steamID, int page = 1, int itemsPerPage = 10)
+        {
+            return _listings
+                .Where(l => l.SellerId == steamID.m_SteamID)
+                .OrderBy(l => l.Id)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ToList();
+        }
+
+        public static int GetPlayerListingsTotalPages(CSteamID steamID, int itemsPerPage = 10)
+        {
+            var count = _listings.Count(l => l.SellerId == steamID.m_SteamID);
+            return (int)System.Math.Ceiling((double)count / itemsPerPage);
+        }
+
+        public static string GetListingDuration(int listingId)
+        {
+            var listing = _listings.FirstOrDefault(l => l.Id == listingId);
+            if (listing == null) return "Unknown";
+
+            var timeElapsed = System.DateTime.Now - listing.ListedAt;
+            var daysListed = (int)timeElapsed.TotalDays;
+            
+            if (daysListed == 0)
+                return "Today";
+            else if (daysListed == 1)
+                return "1 day ago";
+            else
+                return $"{daysListed} days ago";
         }
 
         public static MarketListing GetListing(int id)
@@ -53,7 +100,29 @@ namespace UrpUnturnov.Systems
 
         public static int GetTotalPages(string category = "all", int itemsPerPage = 10)
         {
-            var count = category == "all" ? _listings.Count : _listings.Count(l => GetItemCategory(l.ItemId) == category);
+            return GetTotalPages(category, itemsPerPage, "");
+        }
+
+        public static int GetTotalPages(string category, int itemsPerPage, string searchTerm)
+        {
+            var filteredListings = _listings.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                string lowerSearchTerm = searchTerm.ToLower();
+                filteredListings = filteredListings.Where(l => 
+                    l.ItemName.ToLower().Contains(lowerSearchTerm)
+                );
+            }
+            else
+            {
+                if (category != "all")
+                {
+                    filteredListings = filteredListings.Where(l => GetItemCategory(l.ItemId) == category);
+                }
+            }
+
+            var count = filteredListings.Count();
             return (int)System.Math.Ceiling((double)count / itemsPerPage);
         }
 

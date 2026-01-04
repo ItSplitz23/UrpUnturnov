@@ -145,7 +145,7 @@ namespace UrpUnturnov.Commands
             player.Player.inventory.sendStorage();
 
             UnturnedChat.Say(player, $"Listed {quantity}x {itemName} for ${price:F2} each (ID: {listingId})", UnityEngine.Color.green);
-            UnturnedChat.Say(player, "Item has been removed from your inventory and added to the flea market!", UnityEngine.Color.cyan);
+            // UnturnedChat.Say(player, "Item has been removed from your inventory and added to the flea market!", UnityEngine.Color.cyan);
         }
     }
 }
