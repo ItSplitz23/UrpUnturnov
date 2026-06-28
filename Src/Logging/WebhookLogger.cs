@@ -147,19 +147,19 @@ namespace UrpUnturnov.Logging
             }
             catch (WebException ex)
             {
-                Logger.LogError($"WebhookLogger: Failed to send webhook: {ex.Message}");
+                Logger.LogError($"[Webhooks] Failed to send: {ex.Message}");
 
                 if (ex.Response is HttpWebResponse response)
                 {
                     if (response.StatusCode == (HttpStatusCode)429)
                     {
-                        Logger.LogWarning("WebhookLogger: Rate limited. Consider increasing SendInterval.");
+                        Logger.LogWarning("[Webhooks] Rate limited by Discord.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogError($"WebhookLogger: {ex.Message}");
+                Logger.LogError($"[Webhooks] Error: {ex.Message}");
             }
         }
 

@@ -47,7 +47,7 @@ namespace URPUnturnov
             Instance = this;
             try
             {
-                Logger.Log("Loading URP-FleaMarket");
+                Logger.Log("Initializing FleaMarket...");
                 UrpUnturnov.Commands.ListingCommand.RegisterEventHandlers();
 
                 try
@@ -59,11 +59,11 @@ namespace URPUnturnov
                         Configuration.Instance.DatabasePassword,
                         Configuration.Instance.DatabasePort
                     );
-                    Logger.Log("Database initialized successfully");
+                    Logger.Log("Database connected.");
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError($"Failed to initialize Database Manager: {ex}");
+                    Logger.LogError($"Failed to connect to database: {ex}");
                     return;
                 }
 
@@ -92,11 +92,11 @@ namespace URPUnturnov
                 TimerSendMainWebhookData.Interval = Configuration.Instance.WebhookSendInterval;
                 TimerSendMainWebhookData.Enabled = true;
 
-                Logger.Log("URP-FleaMarket has been loaded");
+                Logger.Log("FleaMarket ready.");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"An error occurred while loading: {ex}");
+                Logger.LogError($"Error during startup: {ex}");
             }
         }
 
@@ -117,11 +117,11 @@ namespace URPUnturnov
                 UrpUnturnov.Commands.ListingCommand.CloseAllMarketGUIs();
                 UrpUnturnov.Commands.ListingCommand.UnregisterEventHandlers();
 
-                Logger.Log("URP-FleaMarket has been unloaded");
+                Logger.Log("FleaMarket stopped.");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Error while unloading: {ex}");
+                Logger.LogError($"Error stopping plugin: {ex}");
             }
         }
 
@@ -156,7 +156,7 @@ namespace URPUnturnov
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Expiry check: {ex.Message}");
+                Logger.LogError($"Listing expiry check failed: {ex.Message}");
             }
         }
 

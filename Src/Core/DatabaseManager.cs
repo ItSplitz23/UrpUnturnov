@@ -42,23 +42,23 @@ namespace URPUnturnov
             {
                 using (var connection = GetConnection())
                 {
-                    Logger.Log("Loading database");
+                    Logger.Log("Connecting to database...");
                     connection.Open();
-                    Logger.Log($"Db state : {connection.State}");
+                    Logger.Log($"DB connection state: {connection.State}");
                     EnsureMarketTable(connection);
                 }
             }
             catch (MySqlException mysqlEx)
             {
                 string errorMessage = GetMySqlErrorDescription(mysqlEx.Number);
-                Logger.LogError($"MySQL Error {mysqlEx.Number}: {mysqlEx.Message}");
-                Logger.LogError($"Error Description: {errorMessage}");
-                Logger.LogError($"Full exception: {mysqlEx}");
+                Logger.LogError($"MySQL Error [{mysqlEx.Number}]: {mysqlEx.Message}");
+                Logger.LogError($"Details: {errorMessage}");
+                Logger.LogError($"Exception trace: {mysqlEx}");
                 MainClass.SendMainWebhook($"DB Error : {mysqlEx.Number}: {errorMessage}");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Failed to initialize database: {ex}");
+                Logger.LogError($"DB setup failed: {ex}");
                 MainClass.SendMainWebhook($"**DATABASE ERROR** - Failed to connect: {ex.Message}");
             }
         }
@@ -144,7 +144,7 @@ namespace URPUnturnov
             MigrateListingsTableAddExpiryLoggedAt(connection);
             EnsureTransactionsTable(connection);
             EnsureStatsTable(connection);
-            Logger.Log("Flea market table ensured.");
+            Logger.Log("Market tables verified.");
         }
 
 
@@ -166,11 +166,11 @@ namespace URPUnturnov
                 {
                     cmd.ExecuteNonQuery();
                 }
-                Logger.Log("urp_flea_listings: migrated status/completed_at.");
+                Logger.Log("Applied status column migrations.");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"MigrateListingsTableAddStatus: {ex.Message}");
+                Logger.LogError($"Status migration error: {ex.Message}");
             }
         }
 
@@ -199,11 +199,11 @@ namespace URPUnturnov
                 {
                     cmd.ExecuteNonQuery();
                 }
-                Logger.Log("urp_flea_listings: migrated expires_at.");
+                Logger.Log("Applied expiration column migrations.");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"MigrateListingsTableAddExpiresAt: {ex.Message}");
+                Logger.LogError($"Expiration migration error: {ex.Message}");
             }
         }
 
@@ -223,11 +223,11 @@ namespace URPUnturnov
                 {
                     cmd.ExecuteNonQuery();
                 }
-                Logger.Log("urp_flea_listings: migrated expiry_logged_at.");
+                Logger.Log("Applied log column migrations.");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"MigrateListingsTableAddExpiryLoggedAt: {ex.Message}");
+                Logger.LogError($"Log migration error: {ex.Message}");
             }
         }
 
@@ -344,7 +344,7 @@ namespace URPUnturnov
             }
             catch (Exception ex)
             {
-                Logger.LogError($"ExecuteInsertAndReturnId failed: {ex}");
+                Logger.LogError($"Insert query failed: {ex}");
                 return -1;
             }
         }
@@ -422,7 +422,7 @@ namespace URPUnturnov
             }
             catch (Exception ex)
             {
-                Logger.LogError($"ExecuteQuery failed: {ex}");
+                Logger.LogError($"Query execution failed: {ex}");
                 return new DataTable();
             }
         }
@@ -439,7 +439,7 @@ namespace URPUnturnov
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Database connection test failed: {ex}");
+                Logger.LogError($"DB ping failed: {ex}");
                 return false;
             }
         }
