@@ -45,10 +45,8 @@ namespace URPUnturnov
                     Logger.Log("Loading database");
                     connection.Open();
                     Logger.Log($"Db state : {connection.State}");
-                    
+                    EnsureMarketTable(connection);
                 }
-
-                MainClass.SendMainWebhook("Db Connected");
             }
             catch (MySqlException mysqlEx)
             {
@@ -107,7 +105,250 @@ namespace URPUnturnov
         {
             return new MySqlConnection(connectionString);
         }
-        
+
+
+
+
+
+
+        public void EnsureMarketTable(MySqlConnection connection)
+        {
+            const string sql = @"
+                CREATE TABLE IF NOT EXISTS urp_flea_listings (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    item_id SMALLINT UNSIGNED NOT NULL,
+                    item_name VARCHAR(255) NOT NULL,
+                    category VARCHAR(32) NOT NULL,
+                    price DECIMAL(20,2) NOT NULL,
+                    seller_name VARCHAR(255) NOT NULL,
+                    seller_id BIGINT UNSIGNED NOT NULL,
+                    quality TINYINT UNSIGNED NOT NULL DEFAULT 0,
+                    state BLOB NULL,
+                    quantity TINYINT UNSIGNED NOT NULL DEFAULT 1,
+                    listed_at DATETIME(6) NOT NULL,
+                    status VARCHAR(20) NOT NULL DEFAULT 'active',
+                    completed_at DATETIME(6) NULL,
+                    expires_at DATETIME(6) NOT NULL,
+                    expiry_logged_at DATETIME(6) NULL,
+                    INDEX idx_seller (seller_id),
+                    INDEX idx_category (category),
+                    INDEX idx_listed (listed_at),
+                    INDEX idx_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            using (var cmd = new MySqlCommand(sql, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            MigrateListingsTableAddStatus(connection);
+            MigrateListingsTableAddExpiresAt(connection);
+            MigrateListingsTableAddExpiryLoggedAt(connection);
+            EnsureTransactionsTable(connection);
+            EnsureStatsTable(connection);
+            Logger.Log("Flea market table ensured.");
+        }
+
+
+
+
+        private void MigrateListingsTableAddStatus(MySqlConnection connection)
+        {
+            try
+            {
+                using (var check = new MySqlCommand("SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'urp_flea_listings' AND COLUMN_NAME = 'status' LIMIT 1", connection))
+                {
+                    if (check.ExecuteScalar() != null) return;
+                }
+                const string alterSql = @"ALTER TABLE urp_flea_listings
+                    ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active',
+                    ADD COLUMN completed_at DATETIME(6) NULL,
+                    ADD INDEX idx_status (status)";
+                using (var cmd = new MySqlCommand(alterSql, connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                Logger.Log("urp_flea_listings: migrated status/completed_at.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"MigrateListingsTableAddStatus: {ex.Message}");
+            }
+        }
+
+
+
+
+        private void MigrateListingsTableAddExpiresAt(MySqlConnection connection)
+        {
+            try
+            {
+                using (var check = new MySqlCommand("SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'urp_flea_listings' AND COLUMN_NAME = 'expires_at' LIMIT 1", connection))
+                {
+                    if (check.ExecuteScalar() != null) return;
+                }
+                const string alterSql = @"ALTER TABLE urp_flea_listings ADD COLUMN expires_at DATETIME(6) NULL";
+                using (var cmd = new MySqlCommand(alterSql, connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                using (var update = new MySqlCommand("UPDATE urp_flea_listings SET expires_at = DATE_ADD(listed_at, INTERVAL 7 DAY) WHERE expires_at IS NULL", connection))
+                {
+                    update.ExecuteNonQuery();
+                }
+                const string notNullSql = @"ALTER TABLE urp_flea_listings MODIFY COLUMN expires_at DATETIME(6) NOT NULL";
+                using (var cmd = new MySqlCommand(notNullSql, connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                Logger.Log("urp_flea_listings: migrated expires_at.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"MigrateListingsTableAddExpiresAt: {ex.Message}");
+            }
+        }
+
+
+
+
+        private void MigrateListingsTableAddExpiryLoggedAt(MySqlConnection connection)
+        {
+            try
+            {
+                using (var check = new MySqlCommand("SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'urp_flea_listings' AND COLUMN_NAME = 'expiry_logged_at' LIMIT 1", connection))
+                {
+                    if (check.ExecuteScalar() != null) return;
+                }
+                const string alterSql = @"ALTER TABLE urp_flea_listings ADD COLUMN expiry_logged_at DATETIME(6) NULL";
+                using (var cmd = new MySqlCommand(alterSql, connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                Logger.Log("urp_flea_listings: migrated expiry_logged_at.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"MigrateListingsTableAddExpiryLoggedAt: {ex.Message}");
+            }
+        }
+
+
+
+
+        private void EnsureTransactionsTable(MySqlConnection connection)
+        {
+            const string sql = @"
+                CREATE TABLE IF NOT EXISTS urp_flea_transactions (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    listing_id INT NOT NULL,
+                    buyer_steam_id BIGINT UNSIGNED NOT NULL,
+                    buyer_name VARCHAR(255) NOT NULL,
+                    seller_steam_id BIGINT UNSIGNED NOT NULL,
+                    seller_name VARCHAR(255) NOT NULL,
+                    item_id SMALLINT UNSIGNED NOT NULL,
+                    item_name VARCHAR(255) NOT NULL,
+                    quantity TINYINT UNSIGNED NOT NULL,
+                    total_paid DECIMAL(20,2) NOT NULL,
+                    fee_amount DECIMAL(20,2) NOT NULL,
+                    seller_payout DECIMAL(20,2) NOT NULL,
+                    created_at DATETIME(6) NOT NULL,
+                    INDEX idx_listing (listing_id),
+                    INDEX idx_buyer (buyer_steam_id),
+                    INDEX idx_seller (seller_steam_id),
+                    INDEX idx_created (created_at)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            using (var cmd = new MySqlCommand(sql, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
+
+        public void RecordTransaction(int listingId, ulong buyerSteamId, string buyerName, ulong sellerSteamId, string sellerName,
+            ushort itemId, string itemName, byte quantity, decimal totalPaid, decimal feeAmount, decimal sellerPayout)
+        {
+            const string sql = @"INSERT INTO urp_flea_transactions (listing_id, buyer_steam_id, buyer_name, seller_steam_id, seller_name, item_id, item_name, quantity, total_paid, fee_amount, seller_payout, created_at)
+                VALUES (@listing_id, @buyer_steam_id, @buyer_name, @seller_steam_id, @seller_name, @item_id, @item_name, @quantity, @total_paid, @fee_amount, @seller_payout, @created_at)";
+            var parameters = new[]
+            {
+                new MySqlParameter("@listing_id", listingId),
+                new MySqlParameter("@buyer_steam_id", buyerSteamId),
+                new MySqlParameter("@buyer_name", buyerName ?? ""),
+                new MySqlParameter("@seller_steam_id", sellerSteamId),
+                new MySqlParameter("@seller_name", sellerName ?? ""),
+                new MySqlParameter("@item_id", itemId),
+                new MySqlParameter("@item_name", itemName ?? ""),
+                new MySqlParameter("@quantity", quantity),
+                new MySqlParameter("@total_paid", totalPaid),
+                new MySqlParameter("@fee_amount", feeAmount),
+                new MySqlParameter("@seller_payout", sellerPayout),
+                new MySqlParameter("@created_at", DateTime.UtcNow)
+            };
+            ExecuteNonQuery(sql, parameters);
+        }
+
+
+
+
+        private void EnsureStatsTable(MySqlConnection connection)
+        {
+            const string createSql = @"
+                CREATE TABLE IF NOT EXISTS urp_flea_stats (
+                    id TINYINT PRIMARY KEY DEFAULT 1,
+                    total_taxed_money DECIMAL(24,2) NOT NULL DEFAULT 0
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+            using (var cmd = new MySqlCommand(createSql, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            const string ensureRowSql = "INSERT IGNORE INTO urp_flea_stats (id, total_taxed_money) VALUES (1, 0)";
+            using (var cmd = new MySqlCommand(ensureRowSql, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
+
+        public void AddTotalTaxedMoney(decimal amount)
+        {
+            if (amount <= 0) return;
+            const string sql = "UPDATE urp_flea_stats SET total_taxed_money = total_taxed_money + @amount WHERE id = 1";
+            ExecuteNonQuery(sql, new MySqlParameter("@amount", amount));
+        }
+
+
+
+
+        public int ExecuteInsertAndReturnId(string insertSql, params MySqlParameter[] parameters)
+        {
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    connection.Open();
+                    using (var command = new MySqlCommand(insertSql, connection))
+                    {
+                        if (parameters != null)
+                            command.Parameters.AddRange(parameters);
+                        command.ExecuteNonQuery();
+                    }
+                    using (var command = new MySqlCommand("SELECT LAST_INSERT_ID()", connection))
+                    {
+                        var result = command.ExecuteScalar();
+                        return result != null && result != DBNull.Value ? Convert.ToInt32(result) : -1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"ExecuteInsertAndReturnId failed: {ex}");
+                return -1;
+            }
+        }
+
         public int ExecuteNonQuery(string query, params MySqlParameter[] parameters)
         {
             try

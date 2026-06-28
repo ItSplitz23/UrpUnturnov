@@ -7,6 +7,7 @@ namespace UrpUnturnov.Data
         public int Id { get; set; }
         public ushort ItemId { get; set; }
         public string ItemName { get; set; }
+        public string Category { get; set; }
         public decimal Price { get; set; }
         public string SellerName { get; set; }
         public ulong SellerId { get; set; }
@@ -14,6 +15,8 @@ namespace UrpUnturnov.Data
         public byte[] State { get; set; }
         public byte Quantity { get; set; }
         public System.DateTime ListedAt { get; set; }
+        public System.DateTime? ExpiresAt { get; set; }
+        public string Status { get; set; }
         public string IconUrl { get; set; }
     }
 }

@@ -34,80 +34,70 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\Assembly-CSharp.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="com.rlabrecque.steamworks.net">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
         </Reference>
         <Reference Include="MySql.Data">
-          <HintPath>..\..\..\..\Downloads\MySql.Data.dll</HintPath>
+          <HintPath>..\..\MySql.Data.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\Newtonsoft.Json.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.API">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.API.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.API.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.Core">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.Core.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.Core.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.Unturned">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.Unturned.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Extras\Rocket.Unturned\Rocket.Unturned.dll</HintPath>
         </Reference>
         <Reference Include="SDG.NetTransport">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\SDG.NetTransport.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\SDG.NetTransport.dll</HintPath>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Threading.Tasks.Extensions">
-          <HintPath>..\..\..\..\Downloads\System.Threading.Tasks.Extensions.dll</HintPath>
+          <HintPath>Libraries\System.Threading.Tasks.Extensions.dll</HintPath>
         </Reference>
         <Reference Include="System.Xml"/>
         <Reference Include="Unity.TextMeshPro">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\Unity.TextMeshPro.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.AnimationModule">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.TextCoreModule">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.TextCoreModule.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.UI.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnityEngine.UI.dll</HintPath>
         </Reference>
         <Reference Include="UnturnedDat">
-          <HintPath>D:\SteamLibrary\steamapps\common\Unturned\Unturned_Data\Managed\UnturnedDat.dll</HintPath>
+          <HintPath>A:\Steam\steamapps\common\Unturned\Unturned_Data\Managed\UnturnedDat.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="Src\Commands\Buy.cs" />
+        <Compile Include="Src\Commands\Claim.cs" />
         <Compile Include="Src\Commands\Listing.cs" />
         <Compile Include="Src\Commands\Sell.cs" />
         <Compile Include="Src\Core\Config.cs" />
         <Compile Include="Src\Core\DatabaseManager.cs" />
+        <Compile Include="Src\Logging\WebhookLogger.cs" />
         <Compile Include="Src\Core\GuiManager.cs" />
         <Compile Include="Src\Core\Main.cs" />
         <Compile Include="Src\Systems\MarketListings.cs" />
         <Compile Include="Src\Systems\MarketManager.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
-
 </Project>

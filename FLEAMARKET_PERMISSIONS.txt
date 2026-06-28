@@ -1,0 +1,21 @@
+Listing expiry: config-only. Add as many ranks as you want – no code change needed.
+
+  ListingExpiryDaysDefault = 1   (everyone without a tier permission)
+
+  ExpiryTiers = list of { PermissionSuffix, Days }
+    Permission = fleamarket.expiry.{PermissionSuffix}
+    Example: PermissionSuffix="3days", Days=3  →  permission fleamarket.expiry.3days gives 3 days
+
+Highest matching tier wins (e.g. if player has both 2days and 5days, they get 5 days).
+
+Example – 6 ranks (add rows in config, then give each group the matching permission in Rocket):
+  <ListingExpiryDaysDefault>1</ListingExpiryDaysDefault>
+  <ExpiryTiers>
+    <ExpiryTier PermissionSuffix="2days" Days="2" />
+    <ExpiryTier PermissionSuffix="3days" Days="3" />
+    <ExpiryTier PermissionSuffix="4days" Days="4" />
+    <ExpiryTier PermissionSuffix="5days" Days="5" />
+    <ExpiryTier PermissionSuffix="7days" Days="7" />
+  </ExpiryTiers>
+
+Rocket: give group VIP fleamarket.expiry.2days, group MVP fleamarket.expiry.3days, etc.
